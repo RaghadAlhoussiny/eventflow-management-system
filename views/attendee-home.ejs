@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - <%= settings.site_name %></title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/attendee.css">
+    <link rel="stylesheet" href="/discovery.css">
+</head>
+<body>
+    <div class="attendee-container">
+        <!-- Site header with dynamic name and description -->
+        <div class="site-header">
+            <h1>🎪 <%= settings.site_name %></h1>
+            <p><%= settings.site_description %></p>
+        </div>
+
+        <!-- Search and Filters Section -->
+        <div class="search-filters">
+            <h3>🔍 Find Your Perfect Event</h3>
+            <!-- Search form submits to GET route for filtering -->
+            <form action="/attendee/search" method="GET" id="search-form">
+                <div class="filter-grid">
+                    <!-- Category filter dropdown -->
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select name="category" class="filter-input">
+                            <!-- Preserve selected category across page reloads -->
+                            <option value="all" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'all' ? 'selected' : '' %>>All Categories</option>
+                            <option value="Fitness" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'Fitness' ? 'selected' : '' %>>Fitness</option>
+                            <option value="Arts" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'Arts' ? 'selected' : '' %>>Arts</option>
+                            <option value="Education" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'Education' ? 'selected' : '' %>>Education</option>
+                            <option value="Business" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'Business' ? 'selected' : '' %>>Business</option>
+                            <option value="Entertainment" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'Entertainment' ? 'selected' : '' %>>Entertainment</option>
+                            <option value="General" <%= typeof searchFilters !== 'undefined' && searchFilters.category === 'General' ? 'selected' : '' %>>General</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Budget filter for price-conscious attendees -->
+                    <div class="filter-group">
+                        <label class="filter-label">Budget Limit ($)</label>
+                        <input type="number" name="maxPrice" class="filter-input" 
+                               placeholder="Enter maximum you want to pay" step="0.01" min="0"
+                               value="<%= typeof searchFilters !== 'undefined' ? searchFilters.maxPrice : '' %>">
+                        <div class="form-help">Show events costing up to this amount</div>
+                    </div>
+                </div>
+                
+                <!-- Search action buttons -->
+                <div class="search-actions">
+                    <button type="submit" class="search-button">
+                        <!-- Loading spinner for search feedback -->
+                        <span id="search-spinner" class="loading-spinner" style="display: none;"></span>
+                        🔍 Search Events
+                    </button>
+                    <button type="button" class="clear-filters" onclick="clearFilters()">
+                        Clear Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Favorites Section - initially hidden, shown when user has favorites -->
+        <div class="favorites-section" id="favorites-section" style="display: none;">
+            <h3>⭐ Your Favorite Events</h3>
+            <div class="favorites-grid" id="favorites-grid"></div>
+        </div>
+
+        <!-- Main events listing section -->
+        <div class="events-section">
+            <!-- Dynamic title based on search state -->
+            <h2>📅 <span id="events-title">
+                <% if (typeof searchFilters !== 'undefined' && (searchFilters.searchTerm || searchFilters.category !== 'all' || searchFilters.minPrice || searchFilters.maxPrice)) { %>
+                    Search Results
+                <% } else { %>
+                    Upcoming Events
+                <% } %>
+            </span></h2>
+            
+            <!-- Results count for user feedback -->
+            <div class="search-results-count" id="results-count">
+                <% if (events && events.length > 0) { %>
+                    Found <%= events.length %> event<%= events.length !== 1 ? 's' : '' %>
+                <% } %>
+            </div>
+            
+            <!-- Events container - dynamically populated -->
+            <div id="events-container">
+                <% if (events && events.length > 0) { %>
+                    <% events.forEach(event => { %>
+                        <!-- Individual event card - clickable to view details -->
+                        <div class="event-card" onclick="location.href='/attendee/event/<%= event.event_id %>'" style="position: relative;">
+                            <!-- Favorite button with click event prevention -->
+                            <button class="favorite-button" onclick="event.stopPropagation(); toggleFavorite('<%= event.event_id %>', this)">
+                                <span id="heart-<%= event.event_id %>">🤍</span>
+                            </button>
+                            
+                            <!-- Dynamic event status badges -->
+                            <% 
+                            // Calculate event characteristics for badge display
+                            const eventCreated = new Date(event.created_date);
+                            const now = new Date();
+                            const daysDifference = (now - eventCreated) / (1000 * 60 * 60 * 24);
+                            const isNew = daysDifference <= 7;
+
+                            // Popularity based on booking count
+                            const isPopular = event.totalBooked && event.totalBooked > 5;
+
+                            // Nearly sold out calculation
+                            const totalTickets = (event.full_price_tickets || 0) + (event.concession_tickets || 0);
+                            const remainingTickets = (event.remainingFull || 0) + (event.remainingConcession || 0);
+                            const isNearlySoldOut = totalTickets > 0 && (remainingTickets / totalTickets) < 0.2;
+
+                            // Premium pricing calculation
+                            const avgPrice = ((event.full_price_cost || 0) + (event.concession_cost || 0)) / 2;
+                            const isPremium = avgPrice > 50;
+                            %>
+
+                            <!-- Priority-based badge display (only one badge per event) -->
+                            <% if (isNew) { %>
+                                <div class="trending-badge badge-new">✨ New</div>
+                            <% } else if (isPopular) { %>
+                                <div class="trending-badge badge-popular">🔥 Popular</div>
+                            <% } else if (isNearlySoldOut) { %>
+                                <div class="trending-badge badge-soldout">⚡ Almost Sold Out</div>
+                            <% } else if (isPremium) { %>
+                                <div class="trending-badge badge-premium">💎 Premium</div>
+                            <% } %>
+                            
+                            <!-- Event title -->
+                            <h3><%= event.title %></h3>
+                            
+                            <!-- Category badges display -->
+                            <div class="category-container">
+                                <% if (event.categories) { %>
+                                    <% event.categories.split(',').forEach(function(cat) { %>
+                                        <span class="category-badge <%= cat.trim().toLowerCase() %>">
+                                            <%= cat.trim() %>
+                                        </span>
+                                    <% }) %>
+                                <% } %>
+                            </div>
+                            
+                            <!-- Event date with formatted display -->
+                            <% if (event.event_date) { %>
+                                <div class="event-date">
+                                    📅 <%= new Date(event.event_date).toLocaleDateString('en-US', { 
+                                        weekday: 'long', 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    }) %>
+                                </div>
+                            <% } else { %>
+                                <div class="event-date">📅 Date TBA</div>
+                            <% } %>
+                            
+                            <!-- Event description -->
+                            <div class="event-description">
+                                <%= event.description ? event.description.substring(0, 200) + (event.description.length > 200 ? '...' : '') : 'No description available.' %>
+                            </div>
+                            
+                            <!-- Social proof and popularity indicators -->
+                            <div class="social-stats">
+                                <div class="booking-count">
+                                    <% if (event.totalBooked) { %>
+                                        <%= event.totalBooked %> people booked
+                                    <% } else { %>
+                                        Be the first to book!
+                                    <% } %>
+                                </div>
+                                <div class="popularity-indicator">
+                                    <% if (event.remainingFull !== undefined && event.remainingConcession !== undefined) { %>
+                                        <%= event.remainingFull + event.remainingConcession %> tickets remaining
+                                    <% } %>
+                                </div>
+                            </div>
+                            
+                            <!-- Ticket pricing information -->
+                            <div class="event-tickets">
+                                <!-- Full price ticket info -->
+                                <div class="ticket-info">
+                                    <div class="ticket-price">$<%= event.full_price_cost || 0 %></div>
+                                    <div class="ticket-label">Full Price</div>
+                                    <div class="ticket-label">
+                                        <% if (event.remainingFull !== undefined) { %>
+                                            (<%= event.remainingFull %> available)
+                                        <% } else { %>
+                                            (<%= event.full_price_tickets || 0 %> available)
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <!-- Concession ticket info -->
+                                <div class="ticket-info concession">
+                                    <div class="ticket-price">$<%= event.concession_cost || 0 %></div>
+                                    <div class="ticket-label">Concession</div>
+                                    <div class="ticket-label">
+                                        <% if (event.remainingConcession !== undefined) { %>
+                                            (<%= event.remainingConcession %> available)
+                                        <% } else { %>
+                                            (<%= event.concession_tickets || 0 %> available)
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Call-to-action button -->
+                            <center>
+                                <span class="book-button">
+                                    🎫 View Details & Book Tickets
+                                </span>
+                            </center>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <!-- Empty state when no events found -->
+                    <div class="no-events">
+                        <h3>🔍</h3>
+                        <h3>No Events Found</h3>
+                        <p>
+                            <% if (typeof searchFilters !== 'undefined' && (searchFilters.searchTerm || searchFilters.category !== 'all' || searchFilters.minPrice || searchFilters.maxPrice)) { %>
+                                Try adjusting your search filters or <a href="/attendee">view all events</a>.
+                            <% } else { %>
+                                Check back soon for exciting upcoming events!
+                            <% } %>
+                        </p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Navigation back to main page -->
+        <div class="back-home">
+            <a href="/" class="btn btn-secondary">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Initialize page functionality when DOM is loaded
+         * Sets up favorites system and loads user preferences
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFavorites();
+            loadFavoritesSection();
+        });
+        
+        //Toggle event favorite status using localStorage
+        function toggleFavorite(eventId, button) {
+            // Get existing favorites from localStorage
+            let favorites = JSON.parse(localStorage.getItem('eventFavorites') || '[]');
+            const heartIcon = document.getElementById('heart-' + eventId);
+            
+            if (favorites.includes(eventId)) {
+                // Remove from favorites
+                favorites = favorites.filter(id => id !== eventId);
+                heartIcon.textContent = '🤍';
+                button.classList.remove('favorited');
+            } else {
+                // Add to favorites
+                favorites.push(eventId);
+                heartIcon.textContent = '❤️';
+                button.classList.add('favorited');
+            }
+            
+            // Save updated favorites list
+            localStorage.setItem('eventFavorites', JSON.stringify(favorites));
+            loadFavoritesSection();
+        }
+        
+        /**
+         * Load and display favorited events from localStorage
+         * Updates heart icons for previously favorited events
+         */
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('eventFavorites') || '[]');
+            
+            favorites.forEach(eventId => {
+                const heartIcon = document.getElementById('heart-' + eventId);
+                const button = document.querySelector(`[onclick*="${eventId}"]`);
+                if (heartIcon) {
+                    heartIcon.textContent = '❤️';
+                    if (button) button.classList.add('favorited');
+                }
+            });
+        }
+        
+        /**
+         * Update the favorites section display
+         * Shows/hides section based on whether user has favorites
+         */
+        function loadFavoritesSection() {
+            const favorites = JSON.parse(localStorage.getItem('eventFavorites') || '[]');
+            const favoritesSection = document.getElementById('favorites-section');
+            const favoritesGrid = document.getElementById('favorites-grid');
+            
+            if (favorites.length > 0) {
+                favoritesSection.style.display = 'block';
+                favoritesGrid.innerHTML = '';
+                
+                // Create favorite event cards
+                favorites.forEach(eventId => {
+                    const eventCard = document.querySelector(`[onclick*="${eventId}"]`);
+                    if (eventCard) {
+                        const title = eventCard.querySelector('h3').textContent;
+                        const favoriteDiv = document.createElement('div');
+                        favoriteDiv.className = 'favorite-event';
+                        favoriteDiv.innerHTML = `
+                            <strong>${title}</strong>
+                            <button onclick="toggleFavorite('${eventId}', this); loadFavoritesSection();" style="float: right; background: none; border: none; font-size: 1.2em; cursor: pointer;">❤️</button>
+                        `;
+                        favoriteDiv.onclick = () => window.location.href = `/attendee/event/${eventId}`;
+                        favoritesGrid.appendChild(favoriteDiv);
+                    }
+                });
+            } else {
+                favoritesSection.style.display = 'none';
+            }
+        }
+        
+        // Clear all search filters and return to main event listing
+        function clearFilters() {
+            document.getElementById('search-form').reset();
+            window.location.href = '/attendee';
+        }
+        
+        // Add loading feedback during search submission
+        // Provides visual feedback while search processes
+        document.getElementById('search-form').addEventListener('submit', function() {
+            const spinner = document.getElementById('search-spinner');
+            const button = document.querySelector('.search-button');
+            spinner.style.display = 'inline-block';
+            button.disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organiser Login - EventFlow</title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/auth.css">
+</head>
+<body class="auth-body">
+     <!-- Main authentication container with glassmorphism effect -->
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>🔐 Organiser Login</h1>
+            <p>Enter your password to access the organiser portal</p>
+        </div>
+        <!-- Error message display - only shown when login fails -->
+        <% if (error === 'invalid') { %>
+            <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                <span class="error-text">Invalid password. Please try again.</span>
+            </div>
+        <% } %>
+
+        <!-- Main login form - submits to POST /login route -->
+        <form action="/login" method="POST" class="auth-form" onsubmit="return validateForm()">
+            <div class="form-group">
+                <!-- Password input with icon and label -->
+                <label for="password" class="form-label">
+                    <span class="label-icon">🔑</span>
+                    Password
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control auth-input" 
+                    required
+                    placeholder="Enter organiser password"
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <!-- Submit button with loading state support -->
+            <button type="submit" class="btn btn-primary auth-button">
+                <span class="button-icon">🚀</span>
+                Access Organiser Portal
+            </button>
+        </form>
+
+        <!-- Information card showing default credentials for demonstration -->
+        <div class="auth-info">
+            <div class="info-card">
+                <h3>Default Login Information</h3>
+                <p><strong>Password:</strong> <code>eventflow2025</code></p>
+                <p class="info-note">
+                    <span class="note-icon">💡</span>
+                    In production, this would be set via environment variables for security.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer with navigation links -->
+        <div class="auth-footer">
+            <a href="/" class="back-link">
+                <span class="back-icon">←</span>
+                Back to Main Page
+            </a>
+             <!-- Alternative navigation to attendee portal -->
+            <div class="attendee-link">
+                <span>Looking for events? Visit the </span>
+                <a href="/attendee">Attendee Portal</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Client-side form validation before submission
+         * Provides immediate feedback for basic validation errors
+         */
+        function validateForm() {
+            // Get password value and remove any leading/trailing spaces
+            const password = document.getElementById('password').value.trim();
+            // Check if password field is empty
+            if (!password) {
+                alert('Please enter a password');
+                return false;
+            }
+            // Basic length check to catch obvious typos
+            if (password.length < 3) {
+                alert('Password seems too short. Please check and try again.');
+                return false;
+            }
+            // All validations passed
+            return true;
+        }
+
+        // Auto-focus password field when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('password').focus();
+        });
+
+        // Handle Enter key
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.auth-form').submit();
+            }
+        });
+    </script>
+</body>
+</html>

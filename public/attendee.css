@@ -1,0 +1,416 @@
+/* ============================================================
+   ATTENDEE PORTAL STYLES
+   ============================================================ */
+/* ------ ATTENDEE HOME PAGE ------ */
+.attendee-container {
+    max-width: 1000px;
+    margin: 2em auto;
+    padding: 2em;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+/* Site header with name and description */
+.site-header {
+    text-align: center;
+    margin-bottom: 3em;
+    padding: 2em;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 12px;
+}
+.site-header h1 {
+    margin: 0 0 0.5em 0;
+    font-size: 3em;
+    color: white;
+    font-weight: 700;
+}
+.site-header p {
+    margin: 0;
+    font-size: 1.3em;
+    opacity: 0.95;
+}
+
+/* Container for events listing section */
+.events-section {
+    margin: 2em 0;
+}
+.events-section h2 {
+    color: #2d3a4b;
+    margin-bottom: 1.5em;
+    font-size: 2.2em;
+    text-align: center;
+    padding-bottom: 0.5em;
+    border-bottom: 3px solid #f093fb;
+}
+/* Individual event card in the listing */
+.event-card {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    padding: 2em;
+    margin: 1.5em 0;
+    border-radius: 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+/* Left accent border for visual hierarchy */
+.event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+/* Hover effects for better interactivity */
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(240,147,251,0.2);
+    border-color: #f093fb;
+}
+
+.event-card h3 {
+    margin: 0 0 1em 0;
+    color: #2d3a4b;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+/* Event date badge styling */
+.event-date {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
+
+/* Event description text */
+.event-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5em;
+    font-size: 1.1em;
+}
+/* Grid layout for ticket pricing display */
+.event-tickets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    margin-bottom: 1.5em;
+}
+/* Individual ticket information container */
+.ticket-info {
+    background: rgba(102,126,234,0.1);
+    padding: 1em;
+    border-radius: 8px;
+    text-align: center;
+}
+/* Different color for concession tickets */
+.ticket-info.concession {
+    background: rgba(240,147,251,0.1);
+}
+/* Price display styling */
+.ticket-price {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #2d3a4b;
+}
+/* Ticket type labels */
+.ticket-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 0.3em;
+}
+/* Call-to-action button for viewing event details */
+.book-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 1em 2em;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.book-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(240,147,251,0.4);
+    color: white;
+    text-decoration: none;
+}
+/* Empty state when no events are available */
+.no-events {
+    text-align: center;
+    padding: 4em 2em;
+    color: #888;
+}
+
+.no-events h3 {
+    font-size: 2em;
+    margin-bottom: 1em;
+    color: #ccc;
+}
+
+/* ------ ATTENDEE EVENT PAGE ------ */
+.event-container {
+    max-width: 800px;
+    margin: 2em auto;
+    padding: 2.5em;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.event-header {
+    text-align: center;
+    margin-bottom: 3em;
+    padding: 2em;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 12px;
+}
+
+.event-header h1 {
+    margin: 0 0 1em 0;
+    font-size: 2.5em;
+    color: white;
+    font-weight: 700;
+}
+
+.event-header .event-date {
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+    opacity: 0.95;
+}
+
+/* Event details content section */
+.event-details {
+    background: #f8f9fa;
+    padding: 2em;
+    border-radius: 12px;
+    margin-bottom: 2em;
+}
+
+.event-details h2 {
+    color: #2d3a4b;
+    margin: 0 0 1em 0;
+    font-size: 1.5em;
+}
+
+.event-description {
+    color: #555;
+    line-height: 1.7;
+    font-size: 1.1em;
+}
+
+.tickets-section {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border: 2px solid #e0e0e0;
+    padding: 2em;
+    border-radius: 12px;
+    margin-bottom: 2em;
+}
+
+.tickets-section h2 {
+    color: #2d3a4b;
+    margin: 0 0 1.5em 0;
+    text-align: center;
+    font-size: 1.8em;
+}
+
+.ticket-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+    margin-bottom: 2em;
+}
+
+/* Individual ticket type card */
+.ticket-type {
+    background: white;
+    padding: 1.5em;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    text-align: center;
+}
+
+/* Color coding for different ticket types */
+.ticket-type.full-price {
+    border-color: #667eea;
+}
+.ticket-type.concession {
+    border-color: #f093fb;
+}
+
+.ticket-type .ticket-price {
+    font-size: 2em;
+    font-weight: 700;
+    color: #2d3a4b;
+    margin-bottom: 0.5em;
+}
+
+.ticket-type .ticket-label {
+    font-weight: 600;
+    margin-bottom: 0.5em;
+}
+
+.tickets-remaining {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.booking-form {
+    background: #f8f9fa;
+    padding: 2em;
+    border-radius: 12px;
+    border-left: 4px solid #f093fb;
+}
+
+.booking-form h3 {
+    color: #2d3a4b;
+    margin: 0 0 1.5em 0;
+    text-align: center;
+}
+
+.ticket-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5em;
+}
+
+.ticket-input {
+    background: white;
+    padding: 1.2em;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.ticket-input label {
+    margin-bottom: 0.8em;
+    color: #2d3a4b;
+}
+
+/* Real-time cost calculation display */
+.cost-calculator {
+    background: white;
+    padding: 1.5em;
+    border-radius: 8px;
+    margin: 1.5em 0;
+    border: 2px solid #667eea;
+}
+.cost-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5em;
+    padding: 0.3em 0;
+}
+.total-cost {
+    border-top: 2px solid #667eea;
+    padding-top: 0.8em;
+    font-weight: 700;
+    font-size: 1.2em;
+    color: #2d3a4b;
+}
+
+/* Warning message for sold out events */
+.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 1em;
+    border-radius: 8px;
+    margin: 1em 0;
+}
+
+/* ------ ATTENDEE BUTTONS ------ */
+.btn-primary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    text-decoration: none;
+}
+.back-home {
+    text-align: center;
+    margin-top: 3em;
+}
+
+/* ------ RESPONSIVE DESIGN ------ */
+@media (max-width: 768px) {
+    .ticket-types,
+    .ticket-selector,
+    .event-tickets {
+        grid-template-columns: 1fr;
+    }
+    .site-header h1 {
+        font-size: 2.2em;
+    }
+    .attendee-container,
+    .event-container {
+        margin: 1em;
+        padding: 1.5em;
+    }
+}
+
+/* ------ EVENT PAGE SPECIFIC STYLES ------ */
+/* Container for event metadata (category and favorite button) */
+.event-meta-container {
+    position: relative;
+}
+
+/* Inline favorite button positioning */
+.favorite-inline {
+    position: static;
+    float: right;
+}
+
+/* ------ BOOKING CONFIRMATION STYLES ------ */
+/* Success message container */
+.booking-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 2px solid #28a745;
+    padding: 2em;
+    border-radius: 12px;
+    margin-bottom: 2em;
+    text-align: center;
+}
+/* Success title styling */
+.success-title {
+    color: #155724;
+    margin: 0 0 1em 0;
+}
+/* Confirmation details container */
+.confirmation-details {
+    background: rgba(255,255,255,0.8);
+    padding: 1.5em;
+    border-radius: 8px;
+    margin: 1em 0;
+}
+/* Highlighted total cost */
+.total-highlight {
+    font-size: 1.2em;
+    color: #28a745;
+}
+/* Success note text */
+.success-note {
+    color: #155724;
+    margin: 0;
+}
+/* ------ SOLD OUT STYLING ------ */
+/* Red text for sold out indicators */
+.sold-out {
+    color: #dc3545;
+}

@@ -1,0 +1,313 @@
+/* ============================================================
+   MAIN PAGE & GLOBAL STYLES
+   ============================================================ */
+/* Reset all margins, padding and set consistent box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base body styling with gradient background */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(120deg, #f0f4f8 0%, #e0eafc 100%);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* ------ MAIN HOME PAGE STYLES ------ */
+.main-home-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Override centering for other pages that don't need it */
+body:not(.main-home-body) {
+    display: block;
+}
+
+/* Main container with glassmorphism effect */
+.center-container {
+    max-width: 800px; 
+    width: 90%;
+    padding: 3em 2.5em;
+    background: rgba(255,255,255,0.97);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Animated background glow effect behind main container */
+.center-container::before {
+    content: '';
+    position: absolute;
+    top: -30px; 
+    left: -30px; 
+    right: -30px; 
+    bottom: -30px;
+    background: linear-gradient(135deg, #b6e0fe 0%, #fbc2eb 100%);
+    filter: blur(40px);
+    z-index: -1;
+    border-radius: 30px;
+}
+
+/* Main heading styling */
+.center-container h1 {
+    color: #2d3a4b;
+    margin-bottom: 0.5em;
+    font-size: 2.5em;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+/* Description text styling */
+.center-container p {
+    color: #4a5a6a;
+    margin-bottom: 2em;
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+/* ------ PORTAL BUTTONS & NAVIGATION ------ */
+/* Container for the two main portal buttons - side by side layout */
+.portal-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+    margin: 2em 0;
+    flex-wrap: nowrap; 
+}
+
+/* Enhanced portal button styling with hover effects */
+.home-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 1.5em 1.5em; 
+    font-size: 1em; 
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-width: 180px; 
+    min-height: 140px; 
+    flex: 0 0 auto; 
+}
+
+/* Specific styling for organiser portal button */
+.home-link.organiser-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+}
+
+/* Specific styling for attendee portal button */
+.home-link.attendee-link {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 8px 25px rgba(240,147,251,0.4);
+}
+
+/* Ripple effect animation on hover */
+.home-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+/* Button hover effects */
+.home-link:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    text-decoration: none;
+    color: white;
+}
+
+/* Expand ripple effect on hover */
+.home-link:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Ensure text stays above ripple effect */
+.home-link span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Portal Icon Styles */
+.link-content-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8em; /* Reduced gap */
+    padding: 0.8em;
+    position: relative;
+    z-index: 1;
+}
+
+/* Portal icon styling with hover animations */
+.portal-icon-large {
+    width: 64px; 
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 3px solid rgba(255,255,255,0.8);
+}
+
+/* Icon hover effects */
+.home-link:hover .portal-icon-large {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    border-color: rgba(255,255,255,1);
+}
+
+/* Access information section below portal buttons */
+.access-info {
+    margin-top: 1.5em;
+    padding-top: 1em;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.access-info p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+}
+
+/* ------ GLOBAL FORM ELEMENTS ------ */
+.form-group {
+    margin-bottom: 1.5em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8em;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+/* ------ GLOBAL BUTTON STYLES ------ */
+/* Base button styling used throughout the application */
+.btn {
+    display: inline-block;
+    padding: 0.8em 1.5em;
+    margin: 0.5em;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-decoration: none;
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 2em;
+}
+
+/* ------ RESPONSIVE DESIGN ------ */
+@media (max-width: 900px) { 
+    .center-container {
+        max-width: 90%;
+        padding: 2em 1.5em;
+    }
+    .center-container h1 {
+        font-size: 2em;
+    }
+    .center-container p {
+        font-size: 1.1em;
+    }
+    /* Stack portal buttons vertically on smaller screens */
+    .portal-buttons-container {
+        flex-direction: column;
+        gap: 1.5em;
+    }
+    
+    .home-link {
+        width: 100%;
+        max-width: 280px;
+        min-width: 200px;
+        min-height: 140px;
+        padding: 1.2em 1.5em;
+    }
+    
+    .portal-icon-large {
+        width: 64px;
+        height: 64px;
+    }
+    
+    .link-content-vertical {
+        gap: 1em;
+    }
+}
+/* Mobile phone responsiveness */
+@media (max-width: 480px) {
+    .center-container h1 {
+        font-size: 1.8em;
+    }
+    
+    .portal-buttons-container {
+        gap: 1em;
+    }
+    
+    .home-link {
+        max-width: 250px;
+        min-width: 180px;
+        min-height: 120px;
+        padding: 1em;
+        font-size: 1em;
+    }
+    
+    .portal-icon-large {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+    }
+    
+    .link-content-vertical {
+        gap: 0.8em;
+    }
+}

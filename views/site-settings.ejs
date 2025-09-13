@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Settings</title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/organiser.css">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Page header section -->
+        <div class="settings-header">
+            <h1>⚙️ Site Settings</h1>
+        </div>
+        
+        <!-- Settings form - allows organiser to update site name and description
+            Submits to POST /organiser/settings route
+            Uses client-side validation before submission -->
+        <form action="/organiser/settings" method="POST" onsubmit="return validateForm()">
+            <!-- Site name input field -->
+            <div class="form-group">
+                <label for="site_name">
+                    Site Name <span class="required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="site_name" 
+                    name="site_name" 
+                    class="form-control" 
+                    value="<%= settings.site_name %>" 
+                    required
+                    maxlength="100"
+                    placeholder="e.g., EventFlow Professional"
+                >
+                <div class="form-help">The name of your event organization (max 100 characters)</div>
+            </div>
+            <!-- Site description textarea field -->
+            <div class="form-group">
+                <label for="site_description">
+                    Site Description <span class="required">*</span>
+                </label>
+                <textarea 
+                    id="site_description" 
+                    name="site_description" 
+                    class="form-control" 
+                    required
+                    maxlength="500"
+                    placeholder="e.g., Professional event management services for all types of events. From corporate conferences to social gatherings, we make event organization simple and efficient."
+                ><%= settings.site_description %></textarea>
+                <div class="form-help">Describe what your organization does (max 500 characters)</div>
+            </div>
+            <!-- Form action buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Settings
+                </button>
+                <a href="/organiser" class="btn btn-secondary">
+                    ← Back to Organiser Home
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        /**
+         * Client-side form validation before submission
+         * Validates required fields and character limits
+         */
+        function validateForm() {
+            const siteName = document.getElementById('site_name').value.trim();
+            const siteDescription = document.getElementById('site_description').value.trim();
+            
+            if (!siteName) {
+                alert('Site name is required!');
+                return false;
+            }
+            if (!siteDescription) {
+                alert('Site description is required!');
+                return false;
+            }
+            if (siteName.length > 100) {
+                alert('Site name must be 100 characters or less!');
+                return false;
+            }
+            if (siteDescription.length > 500) {
+                alert('Site description must be 500 characters or less!');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

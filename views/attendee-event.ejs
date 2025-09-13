@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= event.title %> - Book Tickets</title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/attendee.css">
+    <link rel="stylesheet" href="/discovery.css">
+</head>
+<body>
+    <div class="event-container">
+        <!-- Event header with title and key information -->
+        <div class="event-header">
+            <h1>🎪 <%= event.title %></h1>
+            <div class="event-meta-container">
+                <!-- Primary category badge display -->
+                <span class="category-badge <%= (event.category || 'general').toLowerCase() %>">
+                    <%= event.category || 'General' %>
+                </span>
+                <!-- Favorite button for this event -->
+                <button class="favorite-button favorite-inline" onclick="toggleFavorite('<%= event.event_id %>', this)">
+                    <span id="heart-<%= event.event_id %>">🤍</span>
+                </button>
+            </div>
+            <!-- Event date display with fallback -->
+            <% if (event.event_date) { %>
+                <div class="event-date">
+                    📅 <%= event.event_date %>
+                </div>
+            <% } else { %>
+                <div class="event-date">📅 Date & Time TBA</div>
+            <% } %>
+        </div>
+
+        <!-- Booking confirmation message - shown after successful booking -->
+        <% if (typeof bookingConfirmation !== 'undefined' && bookingConfirmation) { %>
+            <div class="booking-success">
+                <h2 class="success-title">🎉 Booking Confirmed!</h2>
+                <div class="confirmation-details">
+                    <p><strong>Booking ID:</strong> #<%= bookingConfirmation.bookingId %></p>
+                    <p><strong>Attendee:</strong> <%= bookingConfirmation.attendeeName %></p>
+                    <p><strong>Full Price Tickets:</strong> <%= bookingConfirmation.fullTickets %></p>
+                    <p><strong>Concession Tickets:</strong> <%= bookingConfirmation.concessionTickets %></p>
+                    <p class="total-highlight"><strong>Total Cost: $<%= bookingConfirmation.totalCost %></strong></p>
+                </div>
+                <p class="success-note">Your tickets have been successfully booked! The ticket counts below reflect the updated availability.</p>
+            </div>
+        <% } %>
+
+        <!-- Event details section -->
+        <div class="event-details">
+            <h2>📝 Event Details</h2>
+            <div class="event-description">
+                <%= event.description || 'No description available for this event.' %>
+            </div>
+        </div>
+
+        <!-- Ticket booking section -->
+        <div class="tickets-section">
+            <h2>🎫 Available Tickets</h2>
+            
+            <!-- Ticket types display -->
+            <div class="ticket-types">
+                <!-- Full price ticket information -->
+                <div class="ticket-type full-price">
+                    <div class="ticket-price">$<%= event.full_price_cost || 0 %></div>
+                    <div class="ticket-label">Full Price</div>
+                    <div class="tickets-remaining">
+                        <% if (remainingFull > 0) { %>
+                            <%= remainingFull %> tickets remaining
+                        <% } else { %>
+                            <span class="sold-out">SOLD OUT</span>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <!-- Concession ticket information -->
+                <div class="ticket-type concession">
+                    <div class="ticket-price">$<%= event.concession_cost || 0 %></div>
+                    <div class="ticket-label">Concession</div>
+                    <div class="tickets-remaining">
+                        <% if (remainingConcession > 0) { %>
+                            <%= remainingConcession %> tickets remaining
+                        <% } else { %>
+                            <span class="sold-out">SOLD OUT</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking form - only shown if tickets available -->
+            <% if (remainingFull > 0 || remainingConcession > 0) { %>
+                <div class="booking-form">
+                    <h3>📋 Book Your Tickets</h3>
+                    <!-- Booking form submits to POST route -->
+                    <form action="/attendee/event/<%= event.event_id %>/book" method="POST" onsubmit="return validateBooking()">
+                        <!-- Attendee name input -->
+                        <div class="form-group">
+                            <label for="attendee_name">
+                                Your Name <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="attendee_name" 
+                                name="attendee_name" 
+                                class="form-control" 
+                                required
+                                maxlength="100"
+                                placeholder="Enter your full name"
+                            >
+                        </div>
+                        
+                        <!-- Ticket quantity selectors -->
+                        <div class="ticket-selector">
+                            <!-- Full price ticket quantity -->
+                            <div class="ticket-input">
+                                <label for="full_tickets">Full Price Tickets</label>
+                                <input 
+                                    type="number" 
+                                    id="full_tickets" 
+                                    name="full_tickets" 
+                                    class="form-control" 
+                                    min="0" 
+                                    max="<%= remainingFull %>"
+                                    value="0"
+                                    onchange="calculateTotal()"
+                                    <% if (remainingFull === 0) { %>disabled<% } %>
+                                >
+                            </div>
+                            
+                            <!-- Concession ticket quantity -->
+                            <div class="ticket-input">
+                                <label for="concession_tickets">Concession Tickets</label>
+                                <input 
+                                    type="number" 
+                                    id="concession_tickets" 
+                                    name="concession_tickets" 
+                                    class="form-control" 
+                                    min="0" 
+                                    max="<%= remainingConcession %>"
+                                    value="0"
+                                    onchange="calculateTotal()"
+                                    <% if (remainingConcession === 0) { %>disabled<% } %>
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- Live cost calculation display -->
+                        <div class="cost-calculator">
+                            <div class="cost-line">
+                                <span>Full Price: <span id="full-count">0</span> × $<%= event.full_price_cost || 0 %></span>
+                                <span id="full-total">$0.00</span>
+                            </div>
+                            <div class="cost-line">
+                                <span>Concession: <span id="concession-count">0</span> × $<%= event.concession_cost || 0 %></span>
+                                <span id="concession-total">$0.00</span>
+                            </div>
+                            <div class="cost-line total-cost">
+                                <span>Total Cost:</span>
+                                <span id="grand-total">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit button -->
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary" id="book-btn">
+                                🎫 Book Tickets
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <% } else { %>
+                <!-- Sold out message -->
+                <div class="warning">
+                    <strong>⚠️ Event Sold Out</strong><br>
+                    All tickets for this event have been booked. Please check other events or try again later.
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Navigation back to event listings -->
+        <div class="button-group">
+            <a href="/attendee" class="btn btn-secondary">← Back to All Events</a>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Store event data safely for JavaScript calculations
+         * Avoids potential XSS by parsing server-side values
+         */
+        const eventData = {
+            fullPriceCost: parseFloat('<%= event.full_price_cost || 0 %>') || 0,
+            concessionCost: parseFloat('<%= event.concession_cost || 0 %>') || 0,
+            remainingFull: parseInt('<%= remainingFull %>') || 0,
+            remainingConcession: parseInt('<%= remainingConcession %>') || 0
+        };
+        
+        /**
+         * Calculate and update total cost in real-time
+         * Updates display elements as user changes ticket quantities
+         */
+        function calculateTotal() {
+            // Get current ticket quantities
+            const fullTickets = parseInt(document.getElementById('full_tickets').value) || 0;
+            const concessionTickets = parseInt(document.getElementById('concession_tickets').value) || 0;
+            
+            // Calculate costs
+            const fullTotal = fullTickets * eventData.fullPriceCost;
+            const concessionTotal = concessionTickets * eventData.concessionCost;
+            const grandTotal = fullTotal + concessionTotal;
+            
+            // Update display elements
+            document.getElementById('full-count').textContent = fullTickets;
+            document.getElementById('concession-count').textContent = concessionTickets;
+            document.getElementById('full-total').textContent = '$' + fullTotal.toFixed(2);
+            document.getElementById('concession-total').textContent = '$' + concessionTotal.toFixed(2);
+            document.getElementById('grand-total').textContent = '$' + grandTotal.toFixed(2);
+        }
+        
+        /**
+         * Validate booking form before submission
+         */
+        function validateBooking() {
+            // Get form values
+            const name = document.getElementById('attendee_name').value.trim();
+            const fullTickets = parseInt(document.getElementById('full_tickets').value) || 0;
+            const concessionTickets = parseInt(document.getElementById('concession_tickets').value) || 0;
+            
+            // Validate attendee name
+            if (!name) {
+                alert('Please enter your name');
+                return false;
+            }
+            
+            // Ensure at least one ticket is selected
+            if (fullTickets === 0 && concessionTickets === 0) {
+                alert('Please select at least one ticket');
+                return false;
+            }
+            
+            // Check ticket availability
+            if (fullTickets > eventData.remainingFull) {
+                alert('Not enough full price tickets available');
+                return false;
+            }
+            
+            if (concessionTickets > eventData.remainingConcession) {
+                alert('Not enough concession tickets available');
+                return false;
+            }
+            
+            // Final confirmation
+            return confirm('Confirm booking for ' + (fullTickets + concessionTickets) + ' tickets?');
+        }
+        
+        /**
+         * Favorite functionality for this event
+         * Reused from attendee-home for consistency
+         */
+        function toggleFavorite(eventId, button) {
+            let favorites = JSON.parse(localStorage.getItem('eventFavorites') || '[]');
+            const heartIcon = document.getElementById('heart-' + eventId);
+            
+            if (favorites.includes(eventId)) {
+                favorites = favorites.filter(id => id !== eventId);
+                heartIcon.textContent = '🤍';
+                button.classList.remove('favorited');
+            } else {
+                favorites.push(eventId);
+                heartIcon.textContent = '❤️';
+                button.classList.add('favorited');
+            }
+            
+            localStorage.setItem('eventFavorites', JSON.stringify(favorites));
+        }
+        
+        /**
+         * Initialize page functionality
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cost calculation display
+            calculateTotal();
+            
+            // Load favorite status for this event
+            const favorites = JSON.parse(localStorage.getItem('eventFavorites') || '[]');
+            const eventId = '<%= event.event_id %>';
+            if (favorites.includes(eventId)) {
+                const heartIcon = document.getElementById('heart-' + eventId);
+                const button = document.querySelector('.favorite-button');
+                if (heartIcon) {
+                    heartIcon.textContent = '❤️';
+                    if (button) button.classList.add('favorited');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

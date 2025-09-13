@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Event</title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/organiser.css">
+</head>
+<body>
+    <div class="edit-container">
+        <div class="edit-header">
+            <h1>✏️ Edit Event</h1>
+            <!-- Display creation and modification timestamps -->
+            <div class="creation-date">
+                Created: <%= new Date(event.created_date).toLocaleDateString() %>
+                <!-- Show last modified date only if different from creation date -->
+                <% if (event.last_modified && event.last_modified !== event.created_date) { %>
+                    | Last Modified: <%= new Date(event.last_modified).toLocaleDateString() %>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Main event editing form - submits to POST route with event ID -->
+        <form action="/organiser/edit-event/<%= event.event_id %>" method="POST" onsubmit="return validateForm()">
+            
+            <!-- Event Title Input -->
+            <div class="form-group">
+                <label for="title">
+                    Event Title <span class="required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    class="form-control" 
+                    value="<%= event.title || '' %>" 
+                    required
+                    maxlength="200"
+                    placeholder="e.g., Morning Yoga Session"
+                >
+                <div class="form-help">Give your event a clear, descriptive title (max 200 characters)</div>
+            </div>
+            
+            <!-- Event Description Input -->
+            <div class="form-group">
+                <label for="description">
+                    Event Description <span class="required">*</span>
+                </label>
+                <textarea 
+                    id="description" 
+                    name="description" 
+                    class="form-control" 
+                    required
+                    maxlength="1000"
+                    placeholder="Describe your event in detail. What can attendees expect? What should they bring? Any special requirements?"
+                ><%= event.description || '' %></textarea>
+                <div class="form-help">Provide detailed information about your event (max 1000 characters)</div>
+            </div>
+
+            <!-- Event Categories Selection -->
+            <div class="form-group">
+                <label for="categories">
+                    Event Categories <span class="required">*</span>
+                </label>
+                
+                <!-- Information box explaining category system -->
+                <div class="category-info-box">
+                    <p>
+                        <strong>📌 Note:</strong> All events are automatically included in "General" category. 
+                        Select additional categories that best describe your event.
+                    </p>
+                </div>
+                
+                <!-- Category checkboxes in grid layout -->
+                <div class="category-grid">
+                    <!-- General category - always selected and disabled -->
+                    <label class="category-option category-disabled">
+                        <input type="checkbox" name="categories" value="General" checked disabled>
+                        🌟 General (Always Included)
+                    </label>
+                    
+                    <!-- Fitness category checkbox -->
+                    <label class="category-option">
+                        <input type="checkbox" name="categories" value="Fitness" 
+                               <%= event.categories && event.categories.includes('Fitness') ? 'checked' : '' %>>
+                        💪 Fitness & Wellness
+                    </label>
+                    
+                    <!-- Arts category checkbox -->
+                    <label class="category-option">
+                        <input type="checkbox" name="categories" value="Arts" 
+                               <%= event.categories && event.categories.includes('Arts') ? 'checked' : '' %>>
+                        🎨 Arts & Culture
+                    </label>
+                    
+                    <!-- Education category checkbox -->
+                    <label class="category-option">
+                        <input type="checkbox" name="categories" value="Education" 
+                               <%= event.categories && event.categories.includes('Education') ? 'checked' : '' %>>
+                        📚 Education & Learning
+                    </label>
+                    
+                    <!-- Business category checkbox -->
+                    <label class="category-option">
+                        <input type="checkbox" name="categories" value="Business" 
+                               <%= event.categories && event.categories.includes('Business') ? 'checked' : '' %>>
+                        💼 Business & Professional
+                    </label>
+                    
+                    <!-- Entertainment category checkbox -->
+                    <label class="category-option">
+                        <input type="checkbox" name="categories" value="Entertainment" 
+                               <%= event.categories && event.categories.includes('Entertainment') ? 'checked' : '' %>>
+                        🎭 Entertainment & Events
+                    </label>
+                </div>
+                
+                <!-- Example usage help text -->
+                <div class="form-help">
+                    <strong>Example:</strong> A Yoga class would be in "General" + "Fitness". A business workshop would be "General" + "Business".
+                </div>
+            </div>
+            
+            <!-- Event Date and Time Input -->
+            <div class="form-group">
+                <label for="event_date">
+                    Event Date & Time
+                </label>
+                <input 
+                    type="datetime-local" 
+                    id="event_date" 
+                    name="event_date" 
+                    class="form-control" 
+                    value="<%= event.event_date ? event.event_date.split('T')[0] + 'T' + (event.event_date.split('T')[1] || '00:00') : '' %>"
+                >
+                <div class="form-help">When will your event take place?</div>
+            </div>
+            
+            <!-- Full Price Tickets Section -->
+            <div class="ticket-section">
+                <h3>🎫 Full Price Tickets</h3>
+                <div class="form-row">
+                    <!-- Number of full price tickets -->
+                    <div class="form-group">
+                        <label for="full_price_tickets">Number of Tickets</label>
+                        <input 
+                            type="number" 
+                            id="full_price_tickets" 
+                            name="full_price_tickets" 
+                            class="form-control" 
+                            value="<%= event.full_price_tickets || 0 %>" 
+                            min="0"
+                            max="10000"
+                            placeholder="e.g., 50"
+                        >
+                    </div>
+                    <!-- Price per full price ticket -->
+                    <div class="form-group">
+                        <label for="full_price_cost">Price per Ticket ($)</label>
+                        <input 
+                            type="number" 
+                            id="full_price_cost" 
+                            name="full_price_cost" 
+                            class="form-control" 
+                            value="<%= event.full_price_cost || 0 %>" 
+                            min="0"
+                            step="0.01"
+                            max="99999.99"
+                            placeholder="e.g., 25.00"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Concession Tickets Section -->
+            <div class="ticket-section">
+                <h3>🎫 Concession Tickets</h3>
+                <div class="form-row">
+                    <!-- Number of concession tickets -->
+                    <div class="form-group">
+                        <label for="concession_tickets">Number of Tickets</label>
+                        <input 
+                            type="number" 
+                            id="concession_tickets" 
+                            name="concession_tickets" 
+                            class="form-control" 
+                            value="<%= event.concession_tickets || 0 %>" 
+                            min="0"
+                            max="10000"
+                            placeholder="e.g., 20"
+                        >
+                        <div class="form-help">Discounted tickets (students, seniors, etc.)</div>
+                    </div>
+                    <!-- Price per concession ticket -->
+                    <div class="form-group">
+                        <label for="concession_cost">Price per Ticket ($)</label>
+                        <input 
+                            type="number" 
+                            id="concession_cost" 
+                            name="concession_cost" 
+                            class="form-control" 
+                            value="<%= event.concession_cost || 0 %>" 
+                            min="0"
+                            step="0.01"
+                            max="99999.99"
+                            placeholder="e.g., 15.00"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form action buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Changes
+                </button>
+                <a href="/organiser" class="btn btn-secondary">
+                    ← Back to Organiser Home
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        /**
+         * Client-side form validation before submission
+         * Ensures all required fields are completed and category requirements are met
+         */
+        function validateForm() {
+            // Get form values and trim whitespace
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            
+            // Check if at least one additional category is selected beyond General
+            const categoryCheckboxes = document.querySelectorAll('input[name="categories"]:checked');
+            const selectedCategories = Array.from(categoryCheckboxes).map(cb => cb.value);
+            const hasAdditionalCategory = selectedCategories.some(cat => cat !== 'General');
+            
+            // Validate required title field
+            if (!title) {
+                alert('Event title is required!');
+                return false;
+            }
+            // Validate required description field
+            if (!description) {
+                alert('Event description is required!');
+                return false;
+            }
+            // Ensure at least one category beyond General is selected
+            if (!hasAdditionalCategory) {
+                alert('Please select at least one category in addition to General! This helps attendees find your event.');
+                return false;
+            }
+            // Check title length constraint
+            if (title.length > 200) {
+                alert('Event title must be 200 characters or less!');
+                return false;
+            }
+            // Check description length constraint
+            if (description.length > 1000) {
+                alert('Event description must be 1000 characters or less!');
+                return false;
+            }
+            // All validations passed
+            return true;
+        }
+    </script>
+</body>
+</html>

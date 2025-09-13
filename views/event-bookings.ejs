@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings for <%= event.title %></title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/organiser.css">
+</head>
+<body>
+    <div class="bookings-container">
+        <div class="bookings-header">
+            <h1>📊 Event Bookings</h1>
+            <h2><%= event.title %></h2>
+            <!-- Display key event metadata -->
+            <div class="event-info">
+                <p><strong>Event Date:</strong> <%= event.event_date || 'Date TBA' %></p>
+                <p><strong>Created:</strong> <%= new Date(event.created_date).toLocaleDateString() %></p>
+            </div>
+        </div>
+
+        <!-- Statistics Summary -->
+        <div class="stats-grid">
+            <!-- Total number of bookings made -->
+            <div class="stat-card total-bookings">
+                <div class="stat-number"><%= stats.totalBookings %></div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <!-- Total tickets sold across all booking types -->
+            <div class="stat-card tickets-sold">
+                <div class="stat-number"><%= stats.totalTicketsSold %></div>
+                <div class="stat-label">Tickets Sold</div>
+            </div>
+            <!-- Total revenue generated from this event -->
+            <div class="stat-card revenue">
+                <div class="stat-number">$<%= stats.totalRevenue %></div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <!-- Percentage of total capacity sold -->
+            <div class="stat-card percentage">
+                <div class="stat-number"><%= stats.soldOutPercentage %>%</div>
+                <div class="stat-label">Sold Out</div>
+            </div>
+        </div>
+
+        <!-- Ticket Availability -->
+        <div class="availability-section">
+            <h3>🎫 Ticket Availability</h3>
+            <div class="availability-grid">
+                <!-- Full price ticket status -->
+                <div class="availability-item">
+                    <span class="ticket-type">Full Price:</span>
+                    <span class="ticket-count">
+                        <span class="sold"><%= stats.totalFullTickets %> sold</span> / 
+                        <span class="remaining"><%= stats.remainingFull %> remaining</span>
+                    </span>
+                </div>
+                <!-- Concession ticket status -->
+                <div class="availability-item">
+                    <span class="ticket-type">Concession:</span>
+                    <span class="ticket-count">
+                        <span class="sold"><%= stats.totalConcessionTickets %> sold</span> / 
+                        <span class="remaining"><%= stats.remainingConcession %> remaining</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="bookings-section">
+            <h3>📋 Individual Bookings</h3>
+            <!-- Check if any bookings exist for this event -->
+            <% if (bookings && bookings.length > 0) { %>
+                <div class="bookings-table-container">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Attendee Name</th>
+                                <th>Full Price Tickets</th>
+                                <th>Concession Tickets</th>
+                                <th>Total Tickets</th>
+                                <th>Total Cost</th>
+                                <th>Booking Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop through each booking to display details -->
+                            <% bookings.forEach(booking => { %>
+                                <tr class="booking-row">
+                                    <!-- Unique booking identifier -->
+                                    <td class="booking-id">#<%= booking.booking_id %></td>
+                                    <!-- attendee name -->
+                                    <td class="attendee-name"><%= booking.attendee_name %></td>
+                                    <!-- Full price tickets with cost breakdown -->
+                                    <td class="ticket-count">
+                                        <%= booking.full_tickets_booked %>
+                                        <% if (booking.full_tickets_booked > 0) { %>
+                                            <span class="cost-breakdown">($<%= booking.full_cost %>)</span>
+                                        <% } %>
+                                    </td>
+                                    <!-- Concession tickets with cost breakdown -->
+                                    <td class="ticket-count">
+                                        <%= booking.concession_tickets_booked %>
+                                        <% if (booking.concession_tickets_booked > 0) { %>
+                                            <span class="cost-breakdown">($<%= booking.concession_cost %>)</span>
+                                        <% } %>
+                                    </td>
+                                    <!-- Combined ticket count -->
+                                    <td class="total-tickets"><%= booking.total_tickets %></td>
+                                    <!-- Total amount paid -->
+                                    <td class="total-cost">$<%= booking.booking_total %></td>
+                                    <!-- When the booking was made -->
+                                    <td class="booking-date"><%= booking.formatted_date %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <!-- Empty state when no bookings exist -->
+                <div class="no-bookings">
+                    <div class="no-bookings-icon">🎫</div>
+                    <h4>No Bookings Yet</h4>
+                    <p>This event hasn't received any bookings yet. Share the event link to start getting bookings!</p>
+                    <!-- Help organiser understand how to get bookings -->
+                    <div class="sharing-reminder">
+                        <strong>Event Link:</strong>
+                        <code>/attendee/event/<%= event.event_id %></code>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <a href="/organiser" class="btn btn-secondary">← Back to Organiser Home</a>
+            <a href="/organiser/all-bookings" class="btn btn-primary">View All Bookings</a>
+        </div>
+    </div>
+</body>
+</html>

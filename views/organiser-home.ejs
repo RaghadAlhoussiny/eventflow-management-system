@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organiser Home - <%= settings.site_name %></title>
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/organiser.css">
+</head>
+<body>
+    <!-- Main organiser dashboard container -->
+    <div class="organiser-container">
+        
+        <!-- Site header with settings and logout options -->
+        <div class="site-info">
+            <h1><%= settings.site_name %></h1>
+            <p><%= settings.site_description %></p>
+            
+            <!-- Control buttons for site management -->
+            <div class="organiser-controls">
+                <a href="/organiser/settings" class="btn btn-secondary">Site Settings</a>
+                <form action="/logout" method="POST" class="logout-form">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to logout?')">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Create new event button -->
+        <div class="button-group">
+            <form action="/organiser/create-event" method="POST" class="create-event-form">
+                <button type="submit" class="btn btn-primary create-event-btn">
+                    ➕ Create New Event
+                </button>
+            </form>
+        </div>
+
+        <!-- Published Events Section -->
+        <div class="events-section">
+            <h2>📅 Published Events</h2>
+            <% if (publishedEvents && publishedEvents.length > 0) { %>
+                <% publishedEvents.forEach(event => { %>
+                    <div class="event-card">
+                        <h3><%= event.title || 'Untitled Event' %></h3>
+                        
+                        <!-- Event information display -->
+                        <div class="event-details">
+                            <strong>Categories:</strong> 
+                            <% if (event.categories) { %>
+                                <% event.categories.split(',').forEach(function(cat, index) { %>
+                                    <span class="category-badge <%= cat.trim().toLowerCase() %>">
+                                        <%= cat.trim() %>
+                                    </span><% if (index < event.categories.split(',').length - 1) { %> <% } %>
+                                <% }) %>
+                            <% } else { %>
+                                <span class="category-not-set">General</span>
+                            <% } %><br>
+                            
+                            <strong>Date:</strong> <%= event.event_date || 'Not set' %><br>
+                            <strong>Created:</strong> <%= new Date(event.created_date).toLocaleDateString() %><br>
+                            <strong>Published:</strong> <%= event.published_date ? new Date(event.published_date).toLocaleDateString() : 'Not published' %><br>
+                            <strong>Full Price Tickets:</strong> <%= event.full_price_tickets || 0 %> at $<%= event.full_price_cost || 0 %><br>
+                            <strong>Concession Tickets:</strong> <%= event.concession_tickets || 0 %> at $<%= event.concession_cost || 0 %>
+                        </div>
+                        
+                        <!-- Shareable link for attendees -->
+                        <div class="sharing-link">
+                            <strong>Share Link:</strong> 
+                            <a href="/attendee/event/<%= event.event_id %>" target="_blank">
+                                /attendee/event/<%= event.event_id %>
+                            </a>
+                        </div>
+                        
+                        <!-- Action buttons for published events -->
+                        <div class="event-actions">
+                            <a href="/organiser/edit-event/<%= event.event_id %>" class="btn btn-primary">Edit</a>
+                            <a href="/organiser/event/<%= event.event_id %>/bookings" class="btn btn-success">View Bookings</a>
+                            <form action="/organiser/delete-event/<%= event.event_id %>" method="POST" class="delete-form" 
+                                  onsubmit="return confirm('Are you sure you want to delete this event?')">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-events">No published events yet. Create and publish your first event!</div>
+            <% } %>
+        </div>
+
+        <!-- Draft Events Section -->
+        <div class="events-section">
+            <h2>📝 Draft Events</h2>
+            <% if (draftEvents && draftEvents.length > 0) { %>
+                <% draftEvents.forEach(event => { %>
+                    <div class="event-card">
+                        <h3><%= event.title || 'Untitled Event' %></h3>
+                        
+                        <!-- Draft event details with validation indicators -->
+                        <div class="event-details">
+                            <strong>Categories:</strong> 
+                            <% if (event.categories) { %>
+                                <% event.categories.split(',').forEach(function(cat, index) { %>
+                                    <span class="category-badge <%= cat.trim().toLowerCase() %>">
+                                        <%= cat.trim() %>
+                                    </span><% if (index < event.categories.split(',').length - 1) { %> <% } %>
+                                <% }) %>
+                            <% } else { %>
+                                <span class="category-warning">⚠️ Not Set - Required for Publishing</span>
+                            <% } %><br>
+                            
+                            <strong>Date:</strong> <%= event.event_date || 'Not set' %><br>
+                            <strong>Created:</strong> <%= new Date(event.created_date).toLocaleDateString() %><br>
+                            <strong>Last Modified:</strong> <%= new Date(event.last_modified).toLocaleDateString() %><br>
+                            <strong>Full Price Tickets:</strong> <%= event.full_price_tickets || 0 %> at $<%= event.full_price_cost || 0 %><br>
+                            <strong>Concession Tickets:</strong> <%= event.concession_tickets || 0 %> at $<%= event.concession_cost || 0 %>
+                        </div>
+                        
+                        <!-- Action buttons for draft events -->
+                        <div class="event-actions">
+                            <a href="/organiser/edit-event/<%= event.event_id %>" class="btn btn-primary">Edit</a>
+                            <form action="/organiser/publish-event/<%= event.event_id %>" method="POST" class="publish-form"
+                                  onsubmit="return confirm('Are you sure you want to publish this event?')">
+                                <button type="submit" class="btn btn-success">Publish</button>
+                            </form>
+                            <form action="/organiser/delete-event/<%= event.event_id %>" method="POST" class="delete-form"
+                                  onsubmit="return confirm('Are you sure you want to delete this event?')">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-events">No draft events. Click "Create New Event" to get started!</div>
+            <% } %>
+        </div>
+
+        <!-- Navigation back to main page -->
+        <div class="button-group">
+            <a href="/" class="btn btn-secondary">← Back to Main Home</a>
+        </div>
+    </div>
+</body>
+</html>
