@@ -31,7 +31,3 @@ node index.js
 - Node.js & Express
 - SQLite database
 - EJS templating
-
-- Node.js & Express
-- SQLite database
-- EJS templating
