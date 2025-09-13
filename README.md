@@ -1,51 +1,37 @@
 # EventFlow Management System
 
-Full-stack event management platform with organizer dashboard and attendee booking system - Built with Node.js, Express, SQLite, and EJS
+Full-stack event management platform with organizer dashboard and attendee booking system
 
-## Installation & Setup
+## Installation
 
-1. **Clone the repository**
-```bash
-   git clone https://github.com/RaghadAlhoussiny/eventflow-management-system.git
-   cd eventflow-management-system
+1. Clone the repository:
+git clone https://github.com/RaghadAlhoussiny/eventflow-management-system.git
+cd eventflow-management-system
 
-Install dependencies
+2. Install dependencies:
+npm install
 
-bash   npm install
+3. Set up database:
+sqlite3 database.db < db_schema.sql
 
-Set up the database
+4. Start the application:
+node index.js
 
-bash   sqlite3 database.db < db_schema.sql
+5. Open http://localhost:3000
+   - Default password: eventflow2025
 
-Start the application
+## Features
 
-bash   node index.js
+- Event creation and management
+- Booking system with multiple ticket types
+- Real-time availability tracking
+- Responsive design
 
-Access the application
+## Tech Stack
+- Node.js & Express
+- SQLite database
+- EJS templating
 
-Open http://localhost:3000
-Default organizer password: eventflow2025
-
-
-
-Features
-For Event Organizers
-
-Dashboard management with event overview
-Event creation and editing with draft/published workflow
-Real-time booking tracking and attendee management
-Revenue tracking and analytics
-
-For Attendees
-
-Event discovery with search and filtering
-Seamless ticket booking system
-Multiple ticket types (full price and concession)
-Responsive mobile-friendly design
-
-Technology Stack
-
-Backend: Node.js, Express.js
-Database: SQLite
-Frontend: EJS templating, JavaScript, CSS
-Session Management: express-session
+- Node.js & Express
+- SQLite database
+- EJS templating
